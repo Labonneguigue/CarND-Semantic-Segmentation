@@ -58,22 +58,23 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     beta = 1e-3
     stddev = 0.01
 
-    conv_1x1_l7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, 
+    conv_1x1_l7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, 1,
                                    padding='SAME', 
                                    kernel_initializer=tf.random_normal_initializer(stddev=stddev),
                                    kernel_regularizer=tf.contrib.layers.l2_regularizer(beta))
     
-    conv_1x1_l4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, 
+    conv_1x1_l4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, 1,
                                    padding='SAME', 
                                    kernel_initializer=tf.random_normal_initializer(stddev=stddev),
                                    kernel_regularizer=tf.contrib.layers.l2_regularizer(beta))
     
-    conv_1x1_l3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1,
+    conv_1x1_l3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, 1,
                                    padding='SAME',
                                    kernel_initializer=tf.random_normal_initializer(stddev=stddev),
                                    kernel_regularizer=tf.contrib.layers.l2_regularizer(beta))
     
-    transposed_l7 = tf.layers.conv2d_transpose(conv_1x1_l7, num_classes, 4, 2,
+    transposed_l7 = tf.layers.conv2d_transpose(conv_1x1_l7, num_classes, 4,
+                                               strides=(2, 2),
                                                padding='SAME',
                                                kernel_initializer=tf.random_normal_initializer(stddev=stddev),
                                                kernel_regularizer=tf.contrib.layers.l2_regularizer(beta))
@@ -82,6 +83,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
 
     transposed_l7_l4 = tf.layers.conv2d_transpose(l7_l4, num_classes, 4,
                                                   strides=(2, 2),
+                                                  padding='SAME',
                                                   kernel_initializer=tf.random_normal_initializer(stddev=stddev),
                                                   kernel_regularizer=tf.contrib.layers.l2_regularizer(beta))
 
@@ -89,11 +91,13 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
 
     output = tf.layers.conv2d_transpose(l7_l4_l3, num_classes, 16,
                                         strides=(8, 8),
+                                        padding='SAME',
                                         kernel_initializer=tf.random_normal_initializer(stddev=stddev),
                                         kernel_regularizer=tf.contrib.layers.l2_regularizer(beta))
 
     return output
 
+print("Test Layers ...")
 tests.test_layers(layers)
 
 
@@ -108,11 +112,13 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     """
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
     correct_label = tf.reshape(correct_label, (-1,num_classes))
-    cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=correct_label))
+    cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits,
+                                                                                labels=correct_label))
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
     train_operation = optimizer.minimize(cross_entropy_loss)
     return logits, train_operation, cross_entropy_loss
 
+print("Test Optimize ...")
 tests.test_optimize(optimize)
 
 
@@ -147,7 +153,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                                            correct_label: labels,
                                            keep_prob: keep_prob_s,
                                            learning_rate: learning_rate_s})
-            #print("Loss: = {:.3f}".format(loss))
+            print("Loss: = {:.3f}".format(loss))
 
 tests.test_train_nn(train_nn)
 
@@ -175,8 +181,6 @@ def run():
         # OPTIONAL: Augment Images for better results
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
-        number_classes = 2 # Road, Not Road
-
         # TODO: Build NN using load_vgg, layers, and optimize function
 
         # TensorFlow Placeholders
@@ -193,10 +197,8 @@ def run():
         # TODO: Train NN using the train_nn function
 
         #### Hyperparameters ####
-        #learning_rate = 1e-3
-        #keep_prob = 0.5
-        epochs = 10
-        batch_size = 25
+        epochs = 2
+        batch_size = 2
         
         train_nn(sess,
                  epochs,
