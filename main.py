@@ -172,6 +172,8 @@ def run():
     # You'll need a GPU with at least 10 teraFLOPS to train on.
     #  https://www.cityscapes-dataset.com/
 
+    saver = tf.train.Saver()
+
     with tf.Session() as sess:
         # Path to vgg model
         vgg_path = os.path.join(data_dir, 'vgg')
@@ -216,6 +218,8 @@ def run():
 
         # OPTIONAL: Apply the trained model to a video
 
+        # Save the model
+        save_path = saver.save(sess, "/model/model.ckpt")
 
 if __name__ == '__main__':
     run()
