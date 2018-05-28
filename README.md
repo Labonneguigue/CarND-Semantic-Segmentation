@@ -1,4 +1,4 @@
-
+[fcn-archi]: ./images/fcn-architecture.png "archi"
 
 # Semantic Segmentation Project
 
@@ -8,7 +8,9 @@ This project is based on the [Fully Convolutional Networks for Semantic Segmenta
 
 ## Architecture
 
-The encoder part of the FCN is a pre-trained VGG16 on ImageNet and the decoder is obtained by up-sampling the layers 3, 4 and 7 of that model. I applied [regularization](http://www.ritchieng.com/machine-learning/deep-learning/tensorflow/regularization/) to each 1x1 convolutions as well as the transposed convolutions.
+The encoder part of the FCN is a pre-trained VGG16 on ImageNet and the decoder is obtained by up-sampling the layers 3, 4 and 7 of that model. I applied [regularization](http://www.ritchieng.com/machine-learning/deep-learning/tensorflow/regularization/) to each 1x1 convolutions as well as the deconvolutions.
+
+![alt text][fcn-archi]
 
 ## Data
 
@@ -25,9 +27,9 @@ Here is an example of image they provide and the associated labels:
 ## Hyperparameters
 
 I trained the model on 2 Epochs with a batch size of 2 to obtain the following results.
-The dropout probability is 0.5. 
-The learning rate was set to 1e-3.
-Regularization was applied with beta = 1e-3.
+The dropout probability is `0.5`. 
+The learning rate was set to `1e-3`.
+Regularization was applied with `beta = 1e-3`.
 
 
 ## Results
